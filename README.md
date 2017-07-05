@@ -1,14 +1,14 @@
-# Google oauth plugin for GoCD
+# Google OAuth plugin for GoCD
 
-The plugin allows user to login in GoCD using google account. It is implemented using [GoCD authorization endpoint](https://plugin-api.gocd.org/17.5.0/authorization/). Older [Google Oauth Plugin](https://github.com/gocd-contrib/gocd-oauth-login/tree/master/google) was implemented using `GoCD authentication endpoint`, which was deprecated in [GoCD release 17.5.0](https://www.gocd.org/releases/#17.5.0). Hence, we have provided this plugin as its replacement. 
+The plugin allows user to login in GoCD using a google account. It is implemented using [GoCD authorization endpoint](https://plugin-api.gocd.org/current/authorization/). The older [Google Oauth Plugin](https://github.com/gocd-contrib/gocd-oauth-login/tree/master/google) was implemented using `GoCD authentication endpoint`, which was deprecated in [GoCD release 17.5.0](https://www.gocd.org/releases/#17.5.0). Hence, we have provided this plugin as its replacement. 
 
 # Installation
 
-Installation documentation available [here](INSTALL.md)
+Installation documentation available [here](INSTALL.md).
 
 # Capabilities
 
-* Currently supports only authentication capability
+* Currently supports only authentication capability, authorization is TBD.
 
 ## Building the code base
 
