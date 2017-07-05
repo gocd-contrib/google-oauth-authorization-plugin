@@ -19,8 +19,7 @@ on Windows.
 2. Click on **_Create credentials_** and select `OAuth Client Id`
 4. Select `Web application` as a Application type 
 5. Provide appropriate **_Name_** to your api credentials
-6. Specify `http://<<your.go.server.hostname.or.ip>>/go/plugin/cd.go.authorization.google/authenticate` in **_Authorized redirect URIs
-_**. Click on **_Create_**
+6. Specify `http://<<your.go.server.hostname.or.ip>>/go/plugin/cd.go.authorization.google/authenticate` in **_Authorized redirect URIs_**. Click on **_Create_**
 7. Yay!! You have created google api credentials
 8. Note **_Client ID_** and **_Client Secret_**, you will need it to configure plugin in next step
 
