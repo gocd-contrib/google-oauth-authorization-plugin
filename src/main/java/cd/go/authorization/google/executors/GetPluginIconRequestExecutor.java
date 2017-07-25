@@ -17,12 +17,13 @@
 package cd.go.authorization.google.executors;
 
 
-import cd.go.authorization.google.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.apache.commons.codec.binary.Base64;
+
+import static cd.go.authorization.google.utils.Util.readResourceBytes;
+import static java.util.Base64.getEncoder;
 
 public class GetPluginIconRequestExecutor implements RequestExecutor {
     private static final Gson GSON = new Gson();
@@ -31,7 +32,7 @@ public class GetPluginIconRequestExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() throws Exception {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("content_type", getContentType());
-        jsonObject.addProperty("data", Base64.encodeBase64String(Util.readResourceBytes(getIcon())));
+        jsonObject.addProperty("data", getEncoder().encodeToString(readResourceBytes(getIcon())));
         return DefaultGoPluginApiResponse.success( GSON.toJson(jsonObject));
 
     }
