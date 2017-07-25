@@ -19,11 +19,11 @@ package cd.go.authorization.google.executors;
 import cd.go.authorization.google.utils.Util;
 import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
 
 import java.util.HashMap;
 
+import static java.util.Base64.getDecoder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -35,6 +35,6 @@ public class GetPluginIconRequestExecutorTest {
         HashMap<String, String> hashMap = new Gson().fromJson(response.responseBody(), HashMap.class);
         assertThat(hashMap.size(), is(2));
         assertThat(hashMap.get("content_type"), is("image/png"));
-        assertThat(Util.readResourceBytes("/logo.png"), is(Base64.decodeBase64(hashMap.get("data"))));
+        assertThat(Util.readResourceBytes("/logo.png"), is(getDecoder().decode(hashMap.get("data"))));
     }
 }

@@ -16,14 +16,41 @@
 
 apply plugin: 'java'
 
-group = 'cd.go'
-version = '0.0.1'
+def gitRevision = { ->
+    def hashStdOut = new ByteArrayOutputStream()
+    exec {
+        commandLine "git", "log", "-n", "1", "--format=%H"
+        standardOutput = hashStdOut
+    }
 
+    return hashStdOut.toString().trim()
+}
+
+def releaseRevision = { ->
+    def hashStdOut = new ByteArrayOutputStream()
+    exec {
+        commandLine "git", "log", "--pretty=format:"
+        standardOutput = hashStdOut
+    }
+
+    return hashStdOut.size().toString()
+}
+
+def DIST_VERSION = releaseRevision()
+def GIT_REVISION = gitRevision()
+def PLUGIN_VERSION = '1.0.0'
+
+project.ext.distVersion = DIST_VERSION
+project.ext.fullVersion = DIST_VERSION ? "${PLUGIN_VERSION}-${DIST_VERSION}" : PLUGIN_VERSION
+project.ext.gitRevision = GIT_REVISION
+
+group = 'cd.go'
+version = project.fullVersion
 project.ext.pluginDesc = [
         id         : 'cd.go.authorization.google',
-        version    : project.version,
-        goCdVersion: '17.3.0',
-        name       : 'Google oauth authorization plugin for GoCD',
+        version    : project.fullVersion,
+        goCdVersion: '17.5.0',
+        name       : 'Google oauth authorization plugin',
         description: 'Google oauth authorization plugin for GoCD',
         vendorName : 'GoCD Contributors',
         vendorUrl  : 'https://github.com/gocd/google-authorization-plugin'
@@ -40,11 +67,7 @@ repositories {
 dependencies {
     compileOnly group: 'cd.go.plugin', name: 'go-plugin-api', version: '17.4.0'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.0'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
-    compile group: 'commons-io', name: 'commons-io', version: '2.5'
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
     compile group: 'org.brickred', name: 'socialauth', version: '4.14'
-
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
 
     testCompile group: 'cd.go.plugin', name: 'go-plugin-api', version: '17.4.0'
@@ -66,6 +89,55 @@ processResources {
     }
 }
 
+tasks.withType(Jar) { jarTask ->
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+
+    ['MD5', 'SHA1', 'SHA-256'].each { algo ->
+        jarTask.outputs.files("${jarTask.archivePath}.${algo}")
+        jarTask.doLast {
+            ant.checksum file: jarTask.archivePath, format: 'MD5SUM', algorithm: algo
+        }
+    }
+
+    manifest {
+        attributes(
+                'Go-Version': project.pluginDesc.goCdVersion,
+                'Plugin-Revision': project.pluginDesc.version,
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Source-Compatibility': project.sourceCompatibility,
+                'Target-Compatibility': project.targetCompatibility
+        )
+    }
+}
+
+tasks.withType(Test) {
+    outputs.upToDateWhen { false }
+    testLogging {
+        showStandardStreams = project.path != ':server'
+
+        exceptionFormat 'full'
+
+        beforeSuite { suite ->
+            if (suite.parent) {
+                logger.quiet("Running ${suite.name}")
+            }
+        }
+
+        afterSuite { suite, result ->
+            if (suite.parent) {
+                logger.quiet("Tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
+                if (result.resultType == TestResult.ResultType.FAILURE) {
+                    logger.quiet("Test ${suite.name} FAILED")
+                }
+            } else {
+                logger.quiet("Total tests run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}, Time elapsed: ${(result.endTime - result.startTime) / 1000.00} sec")
+            }
+        }
+    }
+}
+
 sourceSets {
     test {
         java {
@@ -81,12 +153,7 @@ jar {
     }
 
 //    This is useful for debugging
-    from(sourceSets.main.java) {
-        into "/"
-    }
-}
-
-task deploy(type: Copy) {
-    from jar
-    into '../../../gocd/server/plugins/external/'
+//    from(sourceSets.main.java) {
+//        into "/"
+//    }
 }
