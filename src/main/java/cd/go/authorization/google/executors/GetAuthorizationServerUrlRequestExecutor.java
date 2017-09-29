@@ -16,7 +16,7 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.Provider;
+import cd.go.authorization.google.GoogleApiClient;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
 import cd.go.authorization.google.requests.GetAuthorizationServerUrlRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -38,8 +38,8 @@ public class GetAuthorizationServerUrlRequestExecutor implements RequestExecutor
             throw new NoAuthorizationConfigurationException("[Authorization Server Url] No authorization configuration found.");
         }
 
-        final Provider provider = request.authConfigs().get(0).getConfiguration().provider();
+        final GoogleApiClient googleApiClient = request.authConfigs().get(0).getConfiguration().googleApiClient();
 
-        return DefaultGoPluginApiResponse.success(GSON.toJson(Collections.singletonMap("authorization_server_url", provider.authorizationServerUrl(request.callbackUrl()))));
+        return DefaultGoPluginApiResponse.success(GSON.toJson(Collections.singletonMap("authorization_server_url", googleApiClient.authorizationServerUrl(request.callbackUrl()))));
     }
 }

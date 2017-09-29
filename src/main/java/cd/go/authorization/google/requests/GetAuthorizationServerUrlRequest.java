@@ -16,6 +16,7 @@
 
 package cd.go.authorization.google.requests;
 
+import cd.go.authorization.google.CallbackURL;
 import cd.go.authorization.google.executors.GetAuthorizationServerUrlRequestExecutor;
 import cd.go.authorization.google.models.AuthConfig;
 import com.google.gson.annotations.Expose;
@@ -34,7 +35,9 @@ public class GetAuthorizationServerUrlRequest extends Request {
     private List<AuthConfig> authConfigs;
 
     public static GetAuthorizationServerUrlRequest from(GoPluginApiRequest apiRequest) {
-        return Request.from(apiRequest, GetAuthorizationServerUrlRequest.class);
+        final GetAuthorizationServerUrlRequest request = Request.from(apiRequest, GetAuthorizationServerUrlRequest.class);
+        CallbackURL.instance().updateRedirectURL(request.callbackUrl);
+        return request;
     }
 
     public String callbackUrl() {

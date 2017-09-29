@@ -16,7 +16,7 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.Provider;
+import cd.go.authorization.google.GoogleApiClient;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
 import cd.go.authorization.google.models.AuthConfig;
 import cd.go.authorization.google.models.GoogleConfiguration;
@@ -32,7 +32,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -45,17 +45,17 @@ public class FetchAccessTokenRequestExecutorTest {
     @Mock
     private AuthConfig authConfig;
     @Mock
-    private GoogleConfiguration pluginConfiguration;
+    private GoogleConfiguration googleConfiguration;
     @Mock
-    private Provider provider;
+    private GoogleApiClient googleApiClient;
     private FetchAccessTokenRequestExecutor executor;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
 
-        when(authConfig.getConfiguration()).thenReturn(pluginConfiguration);
-        when(pluginConfiguration.provider()).thenReturn(provider);
+        when(authConfig.getConfiguration()).thenReturn(googleConfiguration);
+        when(googleConfiguration.googleApiClient()).thenReturn(googleApiClient);
 
         executor = new FetchAccessTokenRequestExecutor(request);
     }
@@ -72,32 +72,23 @@ public class FetchAccessTokenRequestExecutorTest {
 
     @Test
     public void shouldFetchAccessToken() throws Exception {
-        final StubbedTokenInfo tokenInfo = new StubbedTokenInfo("googleplus", "access-token", "secret", "token", 3600, "profile", "id-token");
+        final TokenInfo tokenInfo = new TokenInfo("31239032-xycs.xddasdasdasda", 7200, "foo-type", "refresh-xysaddasdjlascdas");
 
         when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
         when(request.requestParameters()).thenReturn(Collections.singletonMap("code", "code-received-in-previous-step"));
-        when(provider.accessToken(request.requestParameters())).thenReturn(tokenInfo);
+        when(googleApiClient.fetchAccessToken(request.requestParameters())).thenReturn(tokenInfo);
 
         final GoPluginApiResponse response = executor.execute();
 
 
-        String expectedJSON = "{\n" +
-                "  \"provider_id\": \"googleplus\",\n" +
-                "  \"access_token\": \"access-token\",\n" +
-                "  \"secret\": \"secret\",\n" +
-                "  \"token_type\": \"token\",\n" +
-                "  \"expires_in\": 3600,\n" +
-                "  \"scope\": \"profile\",\n" +
-                "  \"id_token\": \"id-token\"\n" +
+        final String expectedJSON = "{\n" +
+                "  \"access_token\": \"31239032-xycs.xddasdasdasda\",\n" +
+                "  \"expires_in\": 7200,\n" +
+                "  \"token_type\": \"foo-type\",\n" +
+                "  \"refresh_token\": \"refresh-xysaddasdjlascdas\"\n" +
                 "}";
 
         assertThat(response.responseCode(), is(200));
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
-    }
-
-    private class StubbedTokenInfo extends TokenInfo {
-        public StubbedTokenInfo(String providerId, String accessToken, String secret, String tokenType, int expiresIn, String scope, String idToken) {
-            super(providerId, accessToken, secret, tokenType, expiresIn, scope, idToken);
-        }
     }
 }

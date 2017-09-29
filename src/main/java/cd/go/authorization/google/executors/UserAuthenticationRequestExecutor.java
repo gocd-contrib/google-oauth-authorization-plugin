@@ -16,8 +16,10 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.Provider;
+import cd.go.authorization.google.GoogleApiClient;
+import cd.go.authorization.google.GoogleUser;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
+import cd.go.authorization.google.models.GoogleConfiguration;
 import cd.go.authorization.google.models.User;
 import cd.go.authorization.google.requests.UserAuthenticationRequest;
 import com.google.gson.Gson;
@@ -28,7 +30,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.thoughtworks.go.plugin.api.response.DefaultGoApiResponse.SUCCESS_RESPONSE_CODE;
+import static cd.go.authorization.google.GooglePlugin.LOG;
+import static java.text.MessageFormat.format;
 
 public class UserAuthenticationRequestExecutor implements RequestExecutor {
     private static final Gson GSON = new Gson();
@@ -44,14 +47,20 @@ public class UserAuthenticationRequestExecutor implements RequestExecutor {
             throw new NoAuthorizationConfigurationException("[Authenticate] No authorization configuration found.");
         }
 
-        final Provider provider = request.authConfigs().get(0).getConfiguration().provider();
-        final User user = provider.userProfile(request.tokenInfo().toAccessGrant());
+        final GoogleConfiguration configuration = request.authConfigs().get(0).getConfiguration();
+        final GoogleApiClient googleApiClient = configuration.googleApiClient();
+        final GoogleUser googleUser = googleApiClient.userProfile(request.tokenInfo());
 
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("user", user);
-        userMap.put("roles", Collections.emptyList());
+        if (configuration.allowedDomains().isEmpty() || configuration.allowedDomains().contains(googleUser.getHd())) {
 
-        DefaultGoPluginApiResponse response = new DefaultGoPluginApiResponse(SUCCESS_RESPONSE_CODE, GSON.toJson(userMap));
-        return response;
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("user", new User(googleUser));
+            userMap.put("roles", Collections.emptyList());
+
+            return DefaultGoPluginApiResponse.success(GSON.toJson(userMap));
+        }
+
+        LOG.warn(format("[Authenticate] User `{0}` is not belongs to allowed domain list.", googleUser.getEmail()));
+        return DefaultGoPluginApiResponse.error(format("[Authenticate] User `{0}` is not belongs to allowed domain list.", googleUser.getEmail()));
     }
 }

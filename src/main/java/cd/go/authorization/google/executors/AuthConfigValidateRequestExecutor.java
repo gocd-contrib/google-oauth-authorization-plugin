@@ -26,6 +26,8 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import java.util.List;
 import java.util.Map;
 
+import static cd.go.authorization.google.GooglePlugin.LOG;
+
 
 public class AuthConfigValidateRequestExecutor implements RequestExecutor {
     private static final Gson GSON = new Gson();
@@ -36,6 +38,8 @@ public class AuthConfigValidateRequestExecutor implements RequestExecutor {
     }
 
     public GoPluginApiResponse execute() throws Exception {
+        LOG.info("[Validate AuthConfig] Validating authorization configuration.");
+
         final List<Map<String, String>> validationResult = new MetadataValidator().validate(request.googleConfiguration());
         return DefaultGoPluginApiResponse.success(GSON.toJson(validationResult));
     }
