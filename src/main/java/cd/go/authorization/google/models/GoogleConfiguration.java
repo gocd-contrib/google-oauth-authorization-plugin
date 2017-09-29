@@ -16,23 +16,20 @@
 
 package cd.go.authorization.google.models;
 
-import cd.go.authorization.google.GoogleProvider;
-import cd.go.authorization.google.Provider;
+import cd.go.authorization.google.GoogleApiClient;
 import cd.go.authorization.google.annotation.ProfileField;
 import cd.go.authorization.google.utils.Util;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
-import org.brickred.socialauth.SocialAuthConfig;
-import org.brickred.socialauth.SocialAuthManager;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import static cd.go.authorization.google.utils.Util.GSON;
 
-public class GoogleConfiguration implements PluginConfiguration {
+public class GoogleConfiguration {
+    private static final String GOOGLE_API_URL = "https://www.googleapis.com";
 
     @Expose
     @SerializedName("ClientId")
@@ -49,6 +46,8 @@ public class GoogleConfiguration implements PluginConfiguration {
     @ProfileField(key = "AllowedDomains", required = false, secure = false)
     private String allowedDomains;
 
+    private GoogleApiClient googleApiClient;
+
     public GoogleConfiguration() {
     }
 
@@ -58,45 +57,24 @@ public class GoogleConfiguration implements PluginConfiguration {
         this.clientSecret = clientSecret;
     }
 
-    @Override
-    public Properties configuration() {
-        Properties properties = new Properties();
-        properties.put("googleapis.com.consumer_key", clientId);
-        properties.put("googleapis.com.consumer_secret", clientSecret);
-        properties.put("www.google.com.custom_permissions", "https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/userinfo.profile,https://www.googleapis.com/auth/plus.me");
-        return properties;
-    }
-
-   public List<String> allowedDomains() {
+    public List<String> allowedDomains() {
         return Util.splitIntoLinesAndTrimSpaces(allowedDomains);
     }
 
-    @Override
     public String clientId() {
         return clientId;
     }
 
-    @Override
     public String clientSecret() {
         return clientSecret;
     }
 
-    @Override
+    public String googleApiUrl() {
+        return GOOGLE_API_URL;
+    }
+
     public String toJSON() {
         return GSON.toJson(this);
-    }
-
-    @Override
-    public Provider provider() throws Exception {
-        return new GoogleProvider(this, socialAuthManager());
-    }
-
-    private SocialAuthManager socialAuthManager() throws Exception {
-        final SocialAuthConfig socialAuthConfiguration = SocialAuthConfig.getDefault();
-        socialAuthConfiguration.load(configuration());
-        final SocialAuthManager manager = new SocialAuthManager();
-        manager.setSocialAuthConfig(socialAuthConfiguration);
-        return manager;
     }
 
     public static GoogleConfiguration fromJSON(String json) {
@@ -106,5 +84,13 @@ public class GoogleConfiguration implements PluginConfiguration {
     public Map<String, String> toProperties() {
         return GSON.fromJson(toJSON(), new TypeToken<Map<String, String>>() {
         }.getType());
+    }
+
+    public GoogleApiClient googleApiClient() {
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient(this);
+        }
+
+        return googleApiClient;
     }
 }

@@ -4,6 +4,7 @@
 # gradle's output dir
 build/
 out/
+*.iml
 
 # the gradle temp dir
 .gradle

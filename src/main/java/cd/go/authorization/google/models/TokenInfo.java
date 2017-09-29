@@ -18,64 +18,31 @@ package cd.go.authorization.google.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import org.brickred.socialauth.Permission;
-import org.brickred.socialauth.util.AccessGrant;
 
 import static cd.go.authorization.google.utils.Util.GSON;
 
 public class TokenInfo {
-
-    @Expose
-    @SerializedName("provider_id")
-    private String providerId;
-
-    @Expose
     @SerializedName("access_token")
+    @Expose
     private String accessToken;
-
-    @Expose
-    @SerializedName("secret")
-    private String secret;
-
-    @Expose
-    @SerializedName("token_type")
-    private String tokenType;
-
-    @Expose
     @SerializedName("expires_in")
-    private int expiresIn;
-
     @Expose
-    @SerializedName("scope")
-    private String scope;
-
+    private long expiresIn;
+    @SerializedName("token_type")
     @Expose
-    @SerializedName("id_token")
-    private String idToken;
+    private String tokenType;
+    @SerializedName("refresh_token")
+    @Expose
+    private String refreshToken;
 
-    private TokenInfo() {
+    TokenInfo() {
     }
 
-    public TokenInfo(AccessGrant accessGrant) {
-        this(
-                accessGrant.getProviderId(),
-                accessGrant.getKey(),
-                accessGrant.getSecret(),
-                attribute(accessGrant, "token_type"),
-                Integer.parseInt(attribute(accessGrant, "expires")),
-                accessGrant.getPermission().getScope(),
-                attribute(accessGrant, "id_token")
-        );
-    }
-
-    protected TokenInfo(String providerId, String accessToken, String secret, String tokenType, int expiresIn, String scope, String idToken) {
-        this.providerId = providerId;
+    public TokenInfo(String accessToken, long expiresIn, String tokenType, String refreshToken) {
         this.accessToken = accessToken;
-        this.secret = secret;
-        this.tokenType = tokenType;
         this.expiresIn = expiresIn;
-        this.scope = scope;
-        this.idToken = idToken;
+        this.tokenType = tokenType;
+        this.refreshToken = refreshToken;
     }
 
     public String accessToken() {
@@ -86,33 +53,42 @@ public class TokenInfo {
         return tokenType;
     }
 
-    public int expiresIn() {
+    public long expiresIn() {
         return expiresIn;
     }
 
-    public String scope() {
-        return scope;
-    }
-
-    public String idToken() {
-        return idToken;
+    public String refreshToken() {
+        return refreshToken;
     }
 
     public String toJSON() {
         return GSON.toJson(this);
     }
 
-    public AccessGrant toAccessGrant() {
-        final AccessGrant accessGrant = new AccessGrant(accessToken, secret);
-        accessGrant.setProviderId(providerId);
-        accessGrant.setPermission(new Permission(scope));
-        accessGrant.setAttribute("expires", expiresIn);
-        accessGrant.setAttribute("id_token", idToken);
-        accessGrant.setAttribute("token_type", tokenType);
-        return accessGrant;
+    public static TokenInfo fromJSON(String json) {
+        return GSON.fromJson(json, TokenInfo.class);
     }
 
-    private static String attribute(AccessGrant accessGrant, String attributeName) {
-        return accessGrant.getAttribute(attributeName).toString();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TokenInfo tokenInfo = (TokenInfo) o;
+
+        if (expiresIn != tokenInfo.expiresIn) return false;
+        if (accessToken != null ? !accessToken.equals(tokenInfo.accessToken) : tokenInfo.accessToken != null)
+            return false;
+        if (tokenType != null ? !tokenType.equals(tokenInfo.tokenType) : tokenInfo.tokenType != null) return false;
+        return refreshToken != null ? refreshToken.equals(tokenInfo.refreshToken) : tokenInfo.refreshToken == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = accessToken != null ? accessToken.hashCode() : 0;
+        result = 31 * result + (int) (expiresIn ^ (expiresIn >>> 32));
+        result = 31 * result + (tokenType != null ? tokenType.hashCode() : 0);
+        result = 31 * result + (refreshToken != null ? refreshToken.hashCode() : 0);
+        return result;
     }
 }

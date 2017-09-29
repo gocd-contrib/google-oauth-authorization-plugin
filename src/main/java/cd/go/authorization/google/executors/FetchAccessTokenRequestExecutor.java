@@ -37,7 +37,8 @@ public class FetchAccessTokenRequestExecutor implements RequestExecutor {
 
         final GoogleConfiguration configuration = request.authConfigs().get(0).getConfiguration();
 
-        final TokenInfo tokenInfo = configuration.provider().accessToken(request.requestParameters());
+        final TokenInfo tokenInfo = configuration.googleApiClient().fetchAccessToken(request.requestParameters());
+
         return DefaultGoPluginApiResponse.success(tokenInfo.toJSON());
     }
 }

@@ -16,7 +16,7 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.GoogleProvider;
+import cd.go.authorization.google.GoogleApiClient;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
 import cd.go.authorization.google.models.AuthConfig;
 import cd.go.authorization.google.models.GoogleConfiguration;
@@ -47,7 +47,7 @@ public class GetAuthorizationServerUrlRequestExecutorTest {
     @Mock
     private GoogleConfiguration googleConfiguration;
     @Mock
-    private GoogleProvider provider;
+    private GoogleApiClient googleApiClient;
 
     private GetAuthorizationServerUrlRequestExecutor executor;
 
@@ -72,8 +72,8 @@ public class GetAuthorizationServerUrlRequestExecutorTest {
     public void shouldReturnAuthorizationServerUrl() throws Exception {
         when(authConfig.getConfiguration()).thenReturn(googleConfiguration);
         when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
-        when(googleConfiguration.provider()).thenReturn(provider);
-        when(provider.authorizationServerUrl(request.callbackUrl())).thenReturn("https://authorization-server-url");
+        when(googleConfiguration.googleApiClient()).thenReturn(googleApiClient);
+        when(googleApiClient.authorizationServerUrl(request.callbackUrl())).thenReturn("https://authorization-server-url");
 
         final GoPluginApiResponse response = executor.execute();
 

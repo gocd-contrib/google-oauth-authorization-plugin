@@ -62,7 +62,7 @@ public class VerifyConnectionRequestExecutor implements RequestExecutor {
         final ValidationResult result = new ValidationResult();
 
         try {
-            configuration.provider().verifyConnection();
+            configuration.googleApiClient().verifyConnection();
         } catch (Exception e) {
             result.addError(new ValidationError(e.getMessage()));
             LOG.error("[Verify Connection] Verify connection failed with errors.", e);

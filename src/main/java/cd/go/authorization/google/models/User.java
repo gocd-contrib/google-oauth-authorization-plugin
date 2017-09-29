@@ -16,9 +16,9 @@
 
 package cd.go.authorization.google.models;
 
+import cd.go.authorization.google.GoogleUser;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import org.brickred.socialauth.Profile;
 
 public class User {
     @Expose
@@ -33,14 +33,29 @@ public class User {
     @SerializedName("email")
     private String emailId;
 
+    User() {
+    }
+
     public User(String username, String displayName, String emailId) {
         this.username = username;
         this.displayName = displayName;
         this.emailId = emailId == null ? null : emailId.toLowerCase().trim();
     }
 
-    public User(Profile userProfile) {
-        this(userProfile.getEmail(), userProfile.getFullName(), userProfile.getEmail());
+    public User(GoogleUser userProfile) {
+        this(userProfile.getEmail(), userProfile.getName(), userProfile.getEmail());
+    }
+
+    public String username() {
+        return username;
+    }
+
+    public String displayName() {
+        return displayName;
+    }
+
+    public String emailId() {
+        return emailId;
     }
 
     @Override

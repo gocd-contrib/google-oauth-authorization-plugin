@@ -16,15 +16,14 @@
 
 package cd.go.authorization.google.executors;
 
-import cd.go.authorization.google.GoogleProvider;
+import cd.go.authorization.google.GoogleApiClient;
+import cd.go.authorization.google.GoogleUser;
 import cd.go.authorization.google.exceptions.NoAuthorizationConfigurationException;
 import cd.go.authorization.google.models.AuthConfig;
 import cd.go.authorization.google.models.GoogleConfiguration;
 import cd.go.authorization.google.models.TokenInfo;
-import cd.go.authorization.google.models.User;
 import cd.go.authorization.google.requests.UserAuthenticationRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.brickred.socialauth.util.AccessGrant;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,9 +33,8 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -51,7 +49,7 @@ public class UserAuthenticationRequestExecutorTest {
     @Mock
     private GoogleConfiguration googleConfiguration;
     @Mock
-    private GoogleProvider googleProvider;
+    private GoogleApiClient googleApiClient;
     private UserAuthenticationRequestExecutor executor;
 
     @Before
@@ -59,7 +57,7 @@ public class UserAuthenticationRequestExecutorTest {
         initMocks(this);
 
         when(authConfig.getConfiguration()).thenReturn(googleConfiguration);
-        when(googleConfiguration.provider()).thenReturn(googleProvider);
+        when(googleConfiguration.googleApiClient()).thenReturn(googleApiClient);
 
         executor = new UserAuthenticationRequestExecutor(request);
     }
@@ -76,29 +74,24 @@ public class UserAuthenticationRequestExecutorTest {
 
     @Test
     public void shouldAuthenticate() throws Exception {
-        final StubbedTokenInfo tokenInfo = new StubbedTokenInfo("googleplus", "access-token", "token", "secret", 3600, "profile", "id-token");
+        final TokenInfo tokenInfo = new TokenInfo("31239032-xycs.xddasdasdasda", 7200, "foo-type", "refresh-xysaddasdjlascdas");
+
         when(request.authConfigs()).thenReturn(Collections.singletonList(authConfig));
         when(request.tokenInfo()).thenReturn(tokenInfo);
-        when(googleProvider.userProfile(any(AccessGrant.class))).thenReturn(new User("bford", "Bob", "email"));
+        when(googleApiClient.userProfile(tokenInfo)).thenReturn(new GoogleUser("foo@bar.com", "Foo Bar"));
 
         final GoPluginApiResponse response = executor.execute();
 
         String expectedJSON = "{\n" +
                 "  \"roles\": [],\n" +
                 "  \"user\": {\n" +
-                "    \"username\": \"bford\",\n" +
-                "    \"display_name\": \"Bob\",\n" +
-                "    \"email\": \"email\"\n" +
+                "    \"username\": \"foo@bar.com\",\n" +
+                "    \"display_name\": \"Foo Bar\",\n" +
+                "    \"email\": \"foo@bar.com\"\n" +
                 "  }\n" +
                 "}";
 
         assertThat(response.responseCode(), is(200));
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);
-    }
-
-    private class StubbedTokenInfo extends TokenInfo {
-        public StubbedTokenInfo(String providerId, String accessToken, String secret, String tokenType, int expiresIn, String scope, String idToken) {
-            super(providerId, accessToken, secret, tokenType, expiresIn, scope, idToken);
-        }
     }
 }
