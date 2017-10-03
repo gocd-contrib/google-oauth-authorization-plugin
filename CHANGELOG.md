@@ -1,4 +1,4 @@
-## 2.0.0 - 2017-09-29
+## 2.0.0 - 2017-10-03
 
 - Removed external dependencies.
 
