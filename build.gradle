@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2019 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: 'java'
+plugins {
+    id 'co.riiid.gradle' version '0.4.2'
+}
 
-apply from: 'plugin-common.gradle'
+apply plugin: 'java'
+apply from: 'plugin-helpers.gradle'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 project.ext.pluginVersion = '2.0.0'
-project.ext.fullVersion = project.distVersion ? "${project.pluginVersion}-${project.distVersion}" : project.pluginVersion
+project.ext.fullVersion = project.git.distVersion() ? "${project.pluginVersion}-${project.git.distVersion()}" : project.pluginVersion
 
 version = project.fullVersion
 group = 'cd.go'
 
 project.ext.pluginDesc = [
         id         : 'cd.go.authorization.google',
+        repo       : rootProject.name,
         version    : project.fullVersion,
         goCdVersion: '17.5.0',
         name       : 'Google oauth authorization plugin',
@@ -52,41 +59,6 @@ dependencies {
     testCompile 'com.squareup.okhttp3:mockwebserver:3.8.1'
 }
 
-processResources {
-    from("src/main/resource-templates") {
-        filesMatching('plugin.xml') {
-            expand project.pluginDesc
-        }
-
-        filesMatching('plugin.properties') {
-            expand project.pluginDesc
-        }
-    }
-}
-
-tasks.withType(Jar) { jarTask ->
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
-
-    ['MD5', 'SHA1', 'SHA-256'].each { algo ->
-        jarTask.outputs.files("${jarTask.archivePath}.${algo}")
-        jarTask.doLast {
-            ant.checksum file: jarTask.archivePath, format: 'MD5SUM', algorithm: algo
-        }
-    }
-
-    manifest {
-        attributes(
-                'Go-Version': project.pluginDesc.goCdVersion,
-                'Plugin-Revision': project.pluginDesc.version,
-                'Implementation-Title': project.name,
-                'Implementation-Version': project.version,
-                'Source-Compatibility': project.sourceCompatibility,
-                'Target-Compatibility': project.targetCompatibility
-        )
-    }
-}
-
 sourceSets {
     test {
         java {
@@ -106,3 +78,5 @@ jar {
 //        into "/"
 //    }
 }
+
+apply from: 'plugin-tasks.gradle'
