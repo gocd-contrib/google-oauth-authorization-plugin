@@ -24,7 +24,7 @@ apply from: 'plugin-helpers.gradle'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-project.ext.pluginVersion = '2.0.0'
+project.ext.pluginVersion = '3.0.0'
 project.ext.fullVersion = project.git.distVersion() ? "${project.pluginVersion}-${project.git.distVersion()}" : project.pluginVersion
 
 version = project.fullVersion
@@ -34,7 +34,7 @@ project.ext.pluginDesc = [
         id         : 'cd.go.authorization.google',
         repo       : rootProject.name,
         version    : project.fullVersion,
-        goCdVersion: '17.5.0',
+        goCdVersion: '19.2.0',
         name       : 'Google oauth authorization plugin',
         description: 'Google oauth authorization plugin for GoCD',
         vendorName : 'GoCD Contributors',
