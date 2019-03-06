@@ -31,6 +31,6 @@ public class GetCapabilitiesRequestExecutor {
     }
 
     Capabilities getCapabilities() {
-        return new Capabilities(SupportedAuthType.Web, true, false);
+        return new Capabilities(SupportedAuthType.Web, true, false, false);
     }
 }

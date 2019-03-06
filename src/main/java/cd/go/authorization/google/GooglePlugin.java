@@ -42,7 +42,7 @@ public class GooglePlugin implements GoPlugin {
     }
 
     @Override
-    public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException {
+    public GoPluginApiResponse handle(GoPluginApiRequest request) {
         try {
             switch (RequestFromServer.fromString(request.requestName())) {
                 case REQUEST_GET_PLUGIN_ICON:
