@@ -14,32 +14,35 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'co.riiid.gradle' version '0.4.2'
-}
-
 apply plugin: 'java'
-apply from: 'plugin-helpers.gradle'
+apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-helpers/master/helper.gradle?_=${(int) (new Date().toInstant().epochSecond / 60)}"
+
+gocdPlugin {
+  id = 'cd.go.authorization.google'
+  pluginVersion = '3.0.0'
+  goCdVersion = '19.2.0'
+  name = 'Google oauth authorization plugin'
+  description = 'Google oauth authorization plugin for GoCD'
+  vendorName = 'ThoughtWorks, Inc.'
+  vendorUrl = 'https://github.com/gocd-contrib/google-oauth-authorization-plugin'
+
+  githubRepo {
+    owner = System.getenv('GITHUB_USER') ?: 'bob'
+    repo = 'google-oauth-authorization-plugin'
+    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
+  }
+
+  pluginProject = project
+
+  prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
+  assetsToRelease = [project.tasks.jar]
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-project.ext.pluginVersion = '3.0.0'
-project.ext.fullVersion = project.git.distVersion() ? "${project.pluginVersion}-${project.git.distVersion()}" : project.pluginVersion
-
-version = project.fullVersion
 group = 'cd.go'
-
-project.ext.pluginDesc = [
-        id         : 'cd.go.authorization.google',
-        repo       : rootProject.name,
-        version    : project.fullVersion,
-        goCdVersion: '19.2.0',
-        name       : 'Google oauth authorization plugin',
-        description: 'Google oauth authorization plugin for GoCD',
-        vendorName : 'GoCD Contributors',
-        vendorUrl  : 'https://github.com/gocd-contrib/google-oauth-authorization-plugin'
-]
+version = gocdPlugin.fullVersion(project)
 
 repositories {
     jcenter()
@@ -78,5 +81,3 @@ jar {
 //        into "/"
 //    }
 }
-
-apply from: 'plugin-tasks.gradle'
