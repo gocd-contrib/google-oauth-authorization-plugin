@@ -59,7 +59,7 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
     testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '2.1'
     testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
-    testCompile 'com.squareup.okhttp3:mockwebserver:4.1.1'
+    testCompile 'com.squareup.okhttp3:mockwebserver:4.2.0'
 }
 
 sourceSets {
