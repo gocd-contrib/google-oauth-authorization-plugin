@@ -1,0 +1,25 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: weekly
+    day: friday
+    timezone: Etc/UCT
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: cd.go.plugin:go-plugin-api
+    versions:
+    - "> 19.7.0"
+  - dependency-name: org.mockito:mockito-core
+    versions:
+    - 3.7.7
+  - dependency-name: junit:junit
+    versions:
+    - 4.13.1
+  - dependency-name: com.squareup.okhttp3:okhttp
+    versions:
+    - 4.9.0
+  - dependency-name: com.squareup.okhttp3:mockwebserver
+    versions:
+    - 4.9.0
