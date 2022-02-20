@@ -22,24 +22,22 @@ import cd.go.authorization.google.models.AuthConfig;
 import cd.go.authorization.google.models.GoogleConfiguration;
 import cd.go.authorization.google.requests.GetAuthorizationServerUrlRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class GetAuthorizationServerUrlRequestExecutorTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
     @Mock
     private GetAuthorizationServerUrlRequest request;
     @Mock
@@ -51,9 +49,9 @@ public class GetAuthorizationServerUrlRequestExecutorTest {
 
     private GetAuthorizationServerUrlRequestExecutor executor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        initMocks(this);
+        openMocks(this);
 
         executor = new GetAuthorizationServerUrlRequestExecutor(request);
     }
@@ -62,10 +60,8 @@ public class GetAuthorizationServerUrlRequestExecutorTest {
     public void shouldErrorOutIfAuthConfigIsNotProvided() throws Exception {
         when(request.authConfigs()).thenReturn(Collections.emptyList());
 
-        thrown.expect(NoAuthorizationConfigurationException.class);
-        thrown.expectMessage("[Authorization Server Url] No authorization configuration found.");
-
-        executor.execute();
+        Throwable t = assertThrows(NoAuthorizationConfigurationException.class, () -> executor.execute());
+        assertThat(t.getMessage(), Matchers.is("[Authorization Server Url] No authorization configuration found."));
     }
 
     @Test

@@ -21,21 +21,20 @@ import cd.go.authorization.google.models.TokenInfo;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class GoogleApiClientTest {
 
@@ -44,12 +43,10 @@ public class GoogleApiClientTest {
     private MockWebServer server;
     private GoogleApiClient googleApiClient;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        initMocks(this);
+        openMocks(this);
 
         server = new MockWebServer();
         server.start();
@@ -62,7 +59,7 @@ public class GoogleApiClientTest {
         googleApiClient = new GoogleApiClient(googleConfiguration);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         server.shutdown();
     }
@@ -117,9 +114,7 @@ public class GoogleApiClientTest {
 
         when(googleConfiguration.googleApiUrl()).thenReturn(server.url("/").toString());
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Api call to `/oauth2/v1/userinfo` failed with error: `Unauthorized`");
-
-        googleApiClient.userProfile(tokenInfo);
+        Throwable t = assertThrows(RuntimeException.class, () -> googleApiClient.userProfile(tokenInfo));
+        assertThat(t.getMessage(), is("Api call to `/oauth2/v1/userinfo` failed with error: `Unauthorized`"));
     }
 }
