@@ -63,7 +63,7 @@ dependencies {
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 
     testImplementation group: 'cd.go.plugin', name: 'go-plugin-api', version: '21.4.0'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.3.1'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.4.0'
     testImplementation group: 'org.hamcrest', name: 'hamcrest-library', version: '2.2'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
     testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.9.3'
