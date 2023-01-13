@@ -68,7 +68,7 @@ ext {
 dependencies {
     compileOnly project.deps.gocdPluginApi
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
 
     testImplementation project.deps.gocdPluginApi
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
