@@ -18,24 +18,30 @@ apply plugin: 'java'
 apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-helpers/master/helper.gradle?_=${(int) (new Date().toInstant().epochSecond / 60)}"
 
 gocdPlugin {
-  id = 'cd.go.authorization.google'
-  pluginVersion = '3.1.0'
-  goCdVersion = '20.9.0'
-  name = 'Google oauth authorization plugin'
-  description = 'Google oauth authorization plugin for GoCD'
-  vendorName = 'ThoughtWorks, Inc.'
-  vendorUrl = 'https://github.com/gocd-contrib/google-oauth-authorization-plugin'
+    id = 'cd.go.authorization.google'
+    pluginVersion = '3.1.0'
+    goCdVersion = '20.9.0'
+    name = 'Google oauth authorization plugin'
+    description = 'Google oauth authorization plugin for GoCD'
+    vendorName = 'ThoughtWorks, Inc.'
+    vendorUrl = 'https://github.com/gocd-contrib/google-oauth-authorization-plugin'
 
-  githubRepo {
-    owner = System.getenv('GITHUB_USER') ?: 'bob'
-    repo = 'google-oauth-authorization-plugin'
-    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
-  }
+    githubRepo {
+        owner = System.getenv('GITHUB_USER') ?: 'bob'
+        repo = 'google-oauth-authorization-plugin'
+        token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
+    }
 
-  pluginProject = project
+    pluginProject = project
 
-  prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
-  assetsToRelease = [project.tasks.jar]
+    prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
+    assetsToRelease = [project.tasks.jar]
+
+    licenseReport {
+        excludes = [
+            'com.squareup.okio:okio' // Seems to not be able to resolve license, not sure if POM issue or jk1-license-report issue. Maybe due to no jar?
+        ]
+    }
 }
 
 group = 'cd.go'
