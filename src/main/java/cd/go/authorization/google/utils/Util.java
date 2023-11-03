@@ -24,10 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class Util {
     public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -37,7 +34,7 @@ public class Util {
     }
 
     public static byte[] readResourceBytes(String resourceFile) {
-        try (InputStream in = Util.class.getResourceAsStream(resourceFile)) {
+        try (InputStream in = Objects.requireNonNull(Util.class.getResourceAsStream(resourceFile))) {
             return readFully(in);
         } catch (IOException e) {
             throw new RuntimeException("Could not find resource " + resourceFile, e);
@@ -72,20 +69,13 @@ public class Util {
         return Arrays.asList(lines.split("\\s*[\r\n]+\\s*"));
     }
 
-    public static List<String> listFromCommaSeparatedString(String str) {
-        if (isBlank(str)) {
-            return Collections.emptyList();
-        }
-        return Arrays.asList(str.split("\\s*,\\s*"));
-    }
-
     public static boolean isBlank(final CharSequence cs) {
         int strLen;
         if (cs == null || (strLen = cs.length()) == 0) {
             return true;
         }
         for (int i = 0; i < strLen; i++) {
-            if (Character.isWhitespace(cs.charAt(i)) == false) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
                 return false;
             }
         }
