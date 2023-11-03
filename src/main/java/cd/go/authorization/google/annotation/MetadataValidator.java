@@ -29,7 +29,7 @@ public class MetadataValidator {
         List<Map<String, String>> result = new ArrayList<>();
         List<String> knownFields = new ArrayList<>();
 
-        for (ProfileMetadata field : MetadataHelper.getMetadata(configuration.getClass())) {
+        for (ProfileMetadata<?> field : MetadataHelper.getMetadata(configuration.getClass())) {
             knownFields.add(field.getKey());
 
             Map<String, String> validationError = field.validate(properties.get(field.getKey()));
@@ -41,7 +41,7 @@ public class MetadataValidator {
 
 
         Set<String> set = new HashSet<>(properties.keySet());
-        set.removeAll(knownFields);
+        knownFields.forEach(set::remove);
 
         if (!set.isEmpty()) {
             for (String key : set) {

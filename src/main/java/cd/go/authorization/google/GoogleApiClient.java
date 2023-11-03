@@ -50,11 +50,7 @@ public class GoogleApiClient {
         this.httpClient = httpClient;
     }
 
-    public void verifyConnection() throws Exception {
-        //TODO:
-    }
-
-    public String authorizationServerUrl(String callbackUrl) throws Exception {
+    public String authorizationServerUrl(String callbackUrl) {
         LOG.debug("[GoogleApiClient] Generating google oauth url.");
 
         return HttpUrl.parse("https://accounts.google.com/o/oauth2/auth")

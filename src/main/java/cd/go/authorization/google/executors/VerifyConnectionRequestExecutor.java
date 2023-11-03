@@ -17,19 +17,14 @@
 package cd.go.authorization.google.executors;
 
 import cd.go.authorization.google.annotation.MetadataValidator;
-import cd.go.authorization.google.models.GoogleConfiguration;
 import cd.go.authorization.google.requests.VerifyConnectionRequest;
 import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import com.thoughtworks.go.plugin.api.response.validation.ValidationError;
-import com.thoughtworks.go.plugin.api.response.validation.ValidationResult;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static cd.go.authorization.google.GooglePlugin.LOG;
 
 public class VerifyConnectionRequestExecutor implements RequestExecutor {
     private static final Gson GSON = new Gson();
@@ -42,13 +37,8 @@ public class VerifyConnectionRequestExecutor implements RequestExecutor {
     @Override
     public GoPluginApiResponse execute() throws Exception {
         List<Map<String, String>> errors = validate();
-        if (errors.size() != 0) {
+        if (!errors.isEmpty()) {
             return validationFailureResponse(errors);
-        }
-
-        ValidationResult validationResult = verifyConnection(request.googleConfiguration());
-        if (!validationResult.isSuccessful()) {
-            return verifyConnectionFailureResponse(validationResult);
         }
 
         return successResponse();
@@ -58,24 +48,8 @@ public class VerifyConnectionRequestExecutor implements RequestExecutor {
         return new MetadataValidator().validate(request.googleConfiguration());
     }
 
-    private ValidationResult verifyConnection(GoogleConfiguration configuration) {
-        final ValidationResult result = new ValidationResult();
-
-        try {
-            configuration.googleApiClient().verifyConnection();
-        } catch (Exception e) {
-            result.addError(new ValidationError(e.getMessage()));
-            LOG.error("[Verify Connection] Verify connection failed with errors.", e);
-        }
-        return result;
-    }
-
     private GoPluginApiResponse successResponse() {
         return responseWith("success", "Connection ok", null);
-    }
-
-    private GoPluginApiResponse verifyConnectionFailureResponse(ValidationResult validationResult) {
-        return responseWith("failure", validationResult.getErrors().get(0).getMessage(), null);
     }
 
     private GoPluginApiResponse validationFailureResponse(List<Map<String, String>> errors) {
@@ -83,11 +57,11 @@ public class VerifyConnectionRequestExecutor implements RequestExecutor {
     }
 
     private GoPluginApiResponse responseWith(String status, String message, List<Map<String, String>> errors) {
-        HashMap<String, Object> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("status", status);
         response.put("message", message);
 
-        if (errors != null && errors.size() > 0) {
+        if (errors != null && !errors.isEmpty()) {
             response.put("errors", errors);
         }
 
