@@ -78,7 +78,7 @@ dependencies {
 
     testImplementation project.deps.gocdPluginApi
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
     testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.12.0'
 
