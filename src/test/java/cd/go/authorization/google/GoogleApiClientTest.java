@@ -18,9 +18,9 @@ package cd.go.authorization.google;
 
 import cd.go.authorization.google.models.GoogleConfiguration;
 import cd.go.authorization.google.models.TokenInfo;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import mockwebserver3.RecordedRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +61,7 @@ public class GoogleApiClientTest {
 
     @AfterEach
     public void tearDown() throws Exception {
-        server.shutdown();
+        server.close();
     }
 
     @Test
@@ -73,9 +73,10 @@ public class GoogleApiClientTest {
 
     @Test
     public void shouldFetchTokenInfoUsingAuthorizationCode() throws Exception {
-        server.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody(new TokenInfo("token-444248275346-5758603453985735", 7200, "bearer", "refresh-token").toJSON()));
+        server.enqueue(new MockResponse.Builder()
+                .code(200)
+                .body(new TokenInfo("token-444248275346-5758603453985735", 7200, "bearer", "refresh-token").toJSON())
+                .build());
 
         when(googleConfiguration.googleApiUrl()).thenReturn(server.url("/").toString());
 
@@ -85,16 +86,17 @@ public class GoogleApiClientTest {
 
         RecordedRequest request = server.takeRequest();
         assertEquals("POST /oauth2/v4/token HTTP/1.1", request.getRequestLine());
-        assertEquals("application/x-www-form-urlencoded", request.getHeader("Content-Type"));
-        assertEquals("client_id=client-id&client_secret=client-secret&code=some-code&grant_type=authorization_code&redirect_uri=callback-url", request.getBody().readUtf8());
+        assertEquals("application/x-www-form-urlencoded", request.getHeaders().get("Content-Type"));
+        assertEquals("client_id=client-id&client_secret=client-secret&code=some-code&grant_type=authorization_code&redirect_uri=callback-url", request.getBody().utf8());
     }
 
     @Test
     public void shouldFetchUserProfile() throws Exception {
         final TokenInfo tokenInfo = new TokenInfo("token-444248275346-5758603453985735", 7200, "bearer", "refresh-token");
-        server.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody(new GoogleUser("foo@bar.com", "Display Name").toJSON()));
+        server.enqueue(new MockResponse.Builder()
+                .code(200)
+                .body(new GoogleUser("foo@bar.com", "Display Name").toJSON())
+                .build());
 
         when(googleConfiguration.googleApiUrl()).thenReturn(server.url("/").toString());
 
@@ -110,7 +112,7 @@ public class GoogleApiClientTest {
     public void shouldErrorOutWhenAPIRequestFails() throws Exception {
         final TokenInfo tokenInfo = new TokenInfo("token-444248275346-5758603453985735", 7200, "bearer", "refresh-token");
 
-        server.enqueue(new MockResponse().setResponseCode(403).setBody("Unauthorized"));
+        server.enqueue(new MockResponse.Builder().code(403).body("Unauthorized").build());
 
         when(googleConfiguration.googleApiUrl()).thenReturn(server.url("/").toString());
 
