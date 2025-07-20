@@ -36,12 +36,6 @@ gocdPlugin {
 
     prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
     assetsToRelease = [project.tasks.jar]
-
-    licenseReport {
-        excludes = [
-            'com.squareup.okio:okio' // Seems to not be able to resolve license, not sure if POM issue or jk1-license-report issue. Maybe due to no jar?
-        ]
-    }
 }
 
 group = 'cd.go'
@@ -57,15 +51,9 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute module("junit:junit") using module("io.quarkus:quarkus-junit4-mock:3.0.0.Final") because "We don't want JUnit 4; but is an unneeded transitive of mockwebserver."
-    }
-}
-
 ext {
     deps = [
-            gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.2.0',
+        gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.2.0',
     ]
 
     versions = project.ext.deps.collectEntries { lib, libGav -> [lib, libGav.split(':').last()] }
@@ -74,19 +62,18 @@ ext {
 dependencies {
     compileOnly project.deps.gocdPluginApi
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.1.0'
 
     testImplementation project.deps.gocdPluginApi
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.18.0'
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
-    testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
-    testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.12.0'
-
     testImplementation platform('org.junit:junit-bom:5.13.2')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
     testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.18.0'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
+    testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
+    testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver3-junit5', version: '5.1.0'
 }
 
 test {
