@@ -68,7 +68,9 @@ ext {
 
 dependencies {
     compileOnly project.deps.gocdPluginApi
-    implementation 'com.google.code.gson:gson:2.13.2'
+    implementation('com.google.code.gson:gson:2.13.2') {
+        exclude(module: 'error_prone_annotations') // Not needed at runtime
+    }
     implementation 'com.squareup.okhttp3:okhttp:5.3.2'
 
     testImplementation project.deps.gocdPluginApi
